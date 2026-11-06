@@ -450,8 +450,32 @@ source, create the module/test-suite/utilities docs).
 
 ![System libraries warning](images/04-12-system-libraries-warning.png)
 
-_(Part 4 continues - test plan documents generated, then the Test Suite Implementation workflow builds
-and runs the tests for a green pass and a coverage percentage. Screenshots to follow.)_
+Before it finishes, the subtask shows you a **summary and asks you to confirm** the planned tests -
+the human-in-the-loop gate again. Choose **"Yes, the test plan is complete and accurate."**
+
+![Review the test plan](images/04-13b-review-test-plan.png)
+
+When it is done, the workflow reports **Complete** and tells you what it created in the IFS:
+
+- a **module spec** documenting all 6 of CREDASM's APIs (with Mermaid flowcharts),
+- a **test suite spec** with **30 test cases** (boundary conditions, edge cases, error branches, SQL
+  database mocking, composite decision logic), and
+- a **test utilities** doc (shared mock-table setup/teardown for database isolation in QTEMP).
+
+![Test plan complete](images/04-13-test-plan-complete.png)
+
+## Part 4b - Implement and run the tests
+
+Click **"Go To Implement RPGUnit Test Plan Workflow"** - it hands off directly. This workflow reads
+the test plan, writes the actual RPGUnit test code, compiles it, and runs it.
+
+Pick the **Working Library** (**SANDBOX**) and confirm the **IFS Project Directory** and the test-plan
+paths (it confirms it found your `testSuites` directory), then select the test suite to implement.
+
+![Implement workflow - select library and locate test plan](images/04-14-implement-select-library.png)
+
+_(Part 4b continues - Bob writes the test code, compiles, and runs the suite for a pass result and a
+coverage percentage. Screenshots to follow.)_
 
 ---
 
