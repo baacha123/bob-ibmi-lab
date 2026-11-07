@@ -319,45 +319,102 @@ this lab pick CREDASM.SQLRPGLE** (the credit-assessment program).
 
 ![Select Member - CREDASM](images/02-05-select-member-credasm.png)
 
-## Step 3 - Watch it work
+## Step 3 - Watch it work (what is actually happening)
 
-Bob parses the program, checks for external dependencies, extracts the rules, and generates the report.
+Bob now works through the program. The screen narrates each step, so you can see what it is doing
+rather than just waiting.
 
 ![Analysis running](images/02-06-analysis-running.png)
 
-A few things to notice:
+Here is what each line means, in order:
 
-- **"No external dependencies detected."** CREDASM is self-contained, so the workflow runs clean. (If
-  a program *does* reference other files Bob cannot find, it will ask you for the path - just provide
-  it. That is normal, not an error.)
-- It found **10 business rules** across the program's procedures (credit check, loan status, interest
-  rate, monthly payment, loan eligibility).
-- The whole thing cost well under a coin.
+- **"269-line RPGLE, FREE, SQL program is being parsed for external dependencies."** First Bob reads
+  the whole program and checks whether it relies on *other* objects (files, copybooks, other programs)
+  it would also need to understand.
+- **"No external dependencies detected."** CREDASM is self-contained - it does not pull in other
+  objects - so the workflow can proceed cleanly.
+  > If a program *does* reference something Bob cannot find, it will **stop and ask you for the path**
+  > instead of guessing. That is normal and correct - just point it at the file. (We see exactly this
+  > honest behaviour later, in Part 4.)
+- **"Extracting Business Rules - 13 bundles, 2 extraction tasks in parallel."** Bob splits the program
+  into logical chunks (by procedure and section) and analyzes several at once to go faster. Each chunk
+  is read for its rules, validations, calculations, and decision logic.
+- **"Extraction complete - 10 rules."** It found 10 distinct business rules across the program's
+  procedures (credit check, loan status, interest rate, monthly payment, loan eligibility).
+- **"Synthesis Report - generating..."** Bob takes those raw findings and writes them up into the
+  eight-section, business-friendly document (the one we read in the next step).
+- **"Mermaid Generation - 2 diagrams generated."** It also draws the logic as diagrams.
 
-When it is done, it offers a **save location** - an IFS path for the Markdown report. Accept it and
-click **Continue**.
+Notice the small number next to each step (for example `0.118`) - that is the **coin cost** of that
+step. The entire extraction here came to roughly a quarter of a coin. Reading a 269-line program and
+producing a full rules document for pennies is the point.
+
+When it is done, it offers a **save location** - an IFS path for the Markdown report.
 
 ![Choose save location](images/02-07-save-location.png)
 
-## Step 4 - Read the report
+> **Your choice here:** you can **accept the suggested IFS path** (Bob picks a sensible folder under
+> your home directory) or **edit the filename/path** to match where your team keeps docs. **For this
+> lab: accept the suggested path** and click **Continue**. Remember it is saving to the **IFS** (the
+> folders world), because a Markdown report is a stream file.
 
-Open the saved file from the **IFS Browser** (Markdown reports live in the IFS). Turn on **Preview** to
-read it nicely.
+## Step 4 - Read the report (and understand what is in it)
+
+Open the saved file from the **IFS Browser** (remember: Markdown reports live in the IFS, not in a
+QSYS library). Turn on **Preview** to read it as a formatted document instead of raw text.
 
 ![Report saved and opened](images/02-08-report-opened.png)
 
-This is a real, business-friendly document: an **Executive Summary** (the program's purpose, its
-decision gates - customer exists, data complete, credit score, affordability at a 43% debt-to-income
-limit - and the refusal reason codes `NO_CUST`, `INV_INPUT`, `LOW_SCORE`, `HIGH_DTI`), an **honest
-note** that the credit score here is simulated, and **detailed business rules** across eight sections.
+This is not a code dump - it is a **business-friendly document** an analyst could read. Let's walk
+through what each part actually contains, so nothing is a mystery. The report has **eight sections**;
+here is what they mean:
 
-It also generated **Mermaid diagrams**. Open one to see the whole decision tree drawn out.
+**1. Executive Summary** - the plain-English "what is this program" overview. For CREDASM it states:
+- **Business Purpose:** CREDASM decides whether a customer qualifies for a loan, and if approved, sets
+  the interest rate and the estimated monthly payment.
+- **Key Business Functions:** assign a credit score, check it against a minimum, confirm the customer
+  exists, price the loan (interest rate), and calculate the monthly payment.
+- **Business Context:** the program is a decision engine that runs a fixed sequence of **gates** - does
+  the customer exist, is the request data complete, is the credit score high enough, and is the loan
+  affordable (a **debt-to-income limit of 43%**). A request is approved only if it passes every gate.
+- **Reason codes:** each refusal carries a code so the outcome can be explained - `NO_CUST` (no
+  customer), `INV_INPUT` (bad input), `LOW_SCORE` (credit score too low), `HIGH_DTI` (debt-to-income
+  too high).
+
+> **An honest note Bob included, not an assumption:** the report flags that the credit score here is
+> **not** based on real credit history - it is derived from the last digit of the customer ID, so it is
+> a simulated/sample scoring rule. That is Bob telling you what the code *actually* does, rather than
+> what you might assume a "credit score" means. This is why extraction beats guessing.
+
+**2. Detailed Business Rules** - the individual rules, grouped by area, each with its logic spelled
+out. For example, the **Credit Score Assignment** rule: if no customer ID is supplied the score
+defaults to 750; if the ID is zero or negative the lowest score (300) applies; otherwise the last
+digit of the customer ID selects the score (shown as a lookup table).
+
+**The remaining sections** cover the other kinds of logic Bob found in the code:
+
+- **Validations** - the input checks the program enforces (which fields must be present, valid ranges).
+- **Calculations** - the formulas, such as how the interest rate and the monthly payment are computed.
+- **Decision logic** - the branching that produces approve/refuse and each reason code.
+- **Data integrity** - what the program assumes about its data and files.
+- **Process flow** - the end-to-end order the gates run in.
+- **Assumptions / coverage notes** - where Bob was uncertain or where the sample app simplifies real
+  behaviour, called out explicitly instead of hidden.
+
+**Mermaid diagrams.** The report also embeds up to three diagrams. Open the decision-tree one to see
+the whole flow drawn out - loan request, each gate in order, every refusal code, and final approval.
 
 ![Mermaid decision tree for CREDASM](images/02-09-mermaid-decision-tree.png)
 
-**You just learned:** Bob read a 269-line RPG program and turned it into a readable rules document
-plus a decision diagram - plain English, the reason codes, even an honest note that the score is
-simulated - for pennies.
+> **How to read the diagram:** each **diamond** is a decision gate ("Customer exists?", "Score at least
+> 700?", "Debt-to-income at or below 43%?"), each **Yes** path moves forward to the next gate, and each
+> **No** path ends in a refusal with its reason code. The only way to the "Approve" box at the bottom
+> is to pass every gate. A business analyst can read the program's entire logic from this one picture.
+
+**You just learned:** Bob read a 269-line RPG program and turned it into an eight-section, readable
+rules document plus a decision diagram - the purpose, the gates, the reason codes, the formulas, and
+an honest note that the score is simulated - for a fraction of a coin. No one had to read the RPG to
+understand what the program does.
 
 ---
 ---
