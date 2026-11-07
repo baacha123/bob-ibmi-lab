@@ -474,8 +474,68 @@ paths (it confirms it found your `testSuites` directory), then select the test s
 
 ![Implement workflow - select library and locate test plan](images/04-14-implement-select-library.png)
 
-_(Part 4b continues - Bob writes the test code, compiles, and runs the suite for a pass result and a
-coverage percentage. Screenshots to follow.)_
+Bob reads the test plan and **generates the RPGUnit test stubs** for CREDASM. (If it warns that
+searching system libraries like QTEMP is slow, choose **"Yes, continue"**.)
+
+![Generating the test stubs](images/04-15-implement-generating-stubs.png)
+
+## Step 4b.2 - Bob diagnoses a missing dependency (and asks you)
+
+Here is a moment worth slowing down on. Bob discovers that CREDASM's `checkCustomerExists` reads a
+table called **CUSTOMRZ** that does not exist in SANDBOX, and that **CREDASM has not been compiled**.
+Instead of failing, it **tells you exactly what is missing and asks how to proceed.**
+
+![Bob diagnoses the missing table and asks](images/04-16-missing-table-decision.png)
+
+> **This is the honest, human-in-the-loop behaviour in action.** Bob does not blindly fail or invent
+> data - it explains the gap and gives you options. Choose the first one: **"Create a minimal CUSTOMRZ
+> table in SANDBOX, compile CREDASM as a module, and implement and run the suite as planned."** Now Bob
+> can set up the test environment and actually run the tests.
+
+## Step 4b.3 - The tests catch a real bug
+
+Bob creates the table, compiles CREDASM, writes the test code and configuration, and runs the suite.
+Two tests **fail** - and this is the best thing that can happen. They caught a **real bug**:
+`calculateMonthlyPayment` truncates the monthly rate, so it returns `299.70` where it should be
+`299.71`. A genuine rounding defect in the business logic, found by the tests.
+
+![The tests catch a real rounding bug](images/04-17-test-found-real-bug.png)
+
+Bob asks how to handle it. Choose **"Fix CREDASM: widen the precision and round the payment, then
+recompile and rerun."**
+
+> **This is the whole point of testing, in one screen.** The suite did not just pass for show - it
+> found a penny-off rounding bug in a payment calculation, flagged it, and asked you what to do. Fixing
+> it completes the loop: write tests, catch a bug, fix the code, rerun.
+
+## Step 4b.4 - Green
+
+Bob fixes CREDASM (widens the precision, rounds with `%dech`), recompiles, and reruns. **All 30 tests
+pass - 44 assertions, 0 failed, 0 errored.** The IBM i Testing panel shows the full green run.
+
+![All 30 tests pass](images/04-18-all-tests-pass.png)
+
+Along the way Bob created the test members (`TCREDASM` with 30 cases, `TSTUTIL` with the mock-table
+helpers), the `TESTING.JSON` config, the `CUSTOMRZ` table, compiled CREDASM, and applied the fix - all
+with your approval at each step.
+
+**You just learned:** Bob can take an untested program, plan tests for it, build and run them, diagnose
+a missing dependency honestly, catch a real bug, fix it, and get to a green suite - your safety net is
+now live.
+
+---
+
+## You did it - the full IBM i flow
+
+With the same Bob you learned in the first lab, now on a real IBM i, you:
+
+- **Understood** an application you had never seen, using the Understand scan for structure.
+- **Documented** a legacy program's business rules in plain English, with diagrams.
+- **Analysed the impact** of a change - instant blast radius from the scan, plus field-level detail.
+- **Tested** a program end to end - and the tests caught and fixed a real bug.
+
+That is understand, document, impact, test - the everyday work of IBM i development, accelerated, with
+you in control the whole way.
 
 ---
 
