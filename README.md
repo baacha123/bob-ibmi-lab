@@ -124,13 +124,16 @@ On the dashboard, click **+ Add application**.
 
 ![Dashboard - Add application](images/00-09-no-applications-add.png)
 
-Fill in the form - **Display name:** `Sandbox App`, **Libraries:** tick **SANDBOX** - then click
-**Add application**.
+Fill in the form, then click **Add application**:
+
+- **Display name** - any friendly name for your app. **For this lab, call it `Sandbox App`.**
+- **Libraries** - tick the library (or libraries) your application's objects live in. This is what
+  Understand will scan. **For this lab, tick `SANDBOX`.**
 
 ![Add application form](images/00-10-add-application-form.png)
 
-> Add the library (or libraries) your application's objects live in - this is what Understand will
-> scan. For our sandbox that is just **SANDBOX**. A real app spanning several libraries would add each.
+> If a real application spanned several libraries, you would add each one here. Our sample app lives in
+> a single library, so we add just **SANDBOX**.
 
 In **Configured applications**, click the **Scan** (play) button next to Sandbox App.
 
@@ -298,17 +301,21 @@ Read the **Welcome** screen, then click **Get Started**.
 
 ## Step 2 - Point it at CREDASM
 
-The workflow detects your QSYS workspace and walks you through three picks:
+The workflow detects your QSYS workspace and walks you through three picks. Each one narrows down to
+the exact program you want to analyze: first the **library**, then the **source file** inside it, then
+the **member** (the actual program).
 
-**Library** - choose **SANDBOX**.
+**Library** - choose the library your program lives in. **For this lab that is SANDBOX.**
 
 ![Select Library - SANDBOX](images/02-03-select-library-sandbox.png)
 
-**Source file** - choose **QRPGLESRC**.
+**Source file** - choose the source physical file that holds your RPG members. RPG usually lives in
+**QRPGLESRC**, so **for this lab pick QRPGLESRC.**
 
 ![Select Source File - QRPGLESRC](images/02-04-select-source-file.png)
 
-**Member** - choose **CREDASM.SQLRPGLE**, then click **Analyze Member**.
+**Member** - choose the specific program you want the rules for, then click **Analyze Member**. **For
+this lab pick CREDASM.SQLRPGLE** (the credit-assessment program).
 
 ![Select Member - CREDASM](images/02-05-select-member-credasm.png)
 
@@ -435,7 +442,9 @@ four kinds of Markdown docs (templates, module docs, test suite docs, and a util
 
 ![Test Plan Creation - Overview](images/04-01-test-plan-overview.png)
 
-Pick your **Working Library** (**SANDBOX**) and accept the **IFS Project Directory**, then **Proceed**.
+Pick your **Working Library** - the library that holds the program you want to test. **For this lab
+that is SANDBOX.** Then accept the **IFS Project Directory** (where the test-plan docs will be saved)
+and click **Proceed**.
 
 ![Select working library](images/04-02-test-plan-select-library.png)
 
@@ -566,8 +575,9 @@ When it is done, the workflow reports **Complete** and tells you what it created
 Click **"Go To Implement RPGUnit Test Plan Workflow"** - it hands off directly. This workflow reads
 the test plan, writes the actual RPGUnit test code, compiles it, and runs it.
 
-Pick the **Working Library** (**SANDBOX**) and confirm the **IFS Project Directory** and the test-plan
-paths (it confirms it found your `testSuites` directory), then select the test suite to implement.
+Pick the **Working Library** - the same one your program and test plan are in. **For this lab that is
+SANDBOX.** Confirm the **IFS Project Directory** and the test-plan paths (it confirms it found your
+`testSuites` directory), then select the test suite to implement.
 
 ![Implement workflow - select library and locate test plan](images/04-14-implement-select-library.png)
 
