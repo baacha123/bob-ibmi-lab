@@ -395,29 +395,60 @@ Pick your **Working Library** (**SANDBOX**) and accept the **IFS Project Directo
 
 ![Select working library](images/04-02-test-plan-select-library.png)
 
-When asked, choose **"No - Create one for me"** (we are starting fresh).
+Then Bob asks whether you already have a test plan.
 
 ![New or existing plan](images/04-03-new-or-existing-plan.png)
 
-Accept the default **directory structure** - these are just folder names for organizing the test-plan
-docs in the IFS (editable to match your team's layout).
+> **Your choices here:**
+> - **Yes - I have an existing test plan** - pick this if you have run this workflow before and just
+>   want to add to or extend the docs you already created.
+> - **No - Create one for me** - pick this to start a brand-new test plan from scratch.
+>
+> **For this lab: pick "No - Create one for me."** We are starting fresh.
+
+Next it shows the **directory structure** for the test-plan docs.
 
 ![Test plan directory structure](images/04-04-test-plan-dir-structure.png)
 
-For the **goal**, pick **"Document New Module and Test Suite (Recommended)"** - it does both at once,
-best for a fresh start.
+> **About these fields:** they are just the folder names Bob will use to organize the test-plan docs in
+> the IFS (a root folder plus sub-folders for templates, modules, test suites, and utilities). You can
+> rename them to match your team's layout. **For this lab: accept the defaults** and click
+> **Create Test Plan**.
+
+Now Bob asks what you want to accomplish - the **goal**.
 
 ![Define goal](images/04-05-define-goal.png)
 
-For **Location Strategy**, keep **Locate (Recommended)** so Bob finds the testable files for you. It
-searches 9 members and finds **one testable file - CREDASM, with 6 procedures.** Keep it checked and
-**Proceed.**
+> **Your choices here:**
+> - **Document New Module and Test Suite** - does both jobs at once: documents the program's procedures
+>   *and* plans the test cases. Best when you are starting fresh.
+> - **Document New Module** - only documents the procedures (the "what does this API do" doc), no tests
+>   planned yet. Pick this if you just want the API documented.
+> - **Document New Test Suite** - adds a test-suite doc to a module you have *already* documented.
+> - **Update Existing Module Document** - refresh a module doc after the code changed (maintenance).
+> - **Update Existing Test Suite Document** - refresh a test-suite doc after your tests changed.
+>
+> **For this lab: pick "Document New Module and Test Suite (Recommended)."** First time through, it
+> does the whole job in one go.
+
+Now Bob asks how to find the testable files - the **Location Strategy**.
 
 ![Locate testable files](images/04-06-locate-testable-files.png)
 
+> **Your choices here:**
+> - **Locate (Recommended)** - Bob automatically searches your library and finds the files that have
+>   exported procedures (the testable ones).
+> - **Manual** - you pick the files yourself.
+>
+> **For this lab: pick "Locate (Recommended)."** Let Bob find them.
+
+Bob searches the 9 members and finds **one testable file - CREDASM, with 6 procedures.** Keep it
+checked and **Proceed.**
+
 > **This is the monolith lesson, live.** Bob checked all 9 members and only CREDASM came back as
 > testable - because it is the only one whose logic lives in exported procedures. The others keep their
-> logic in the mainline, so RPGUnit cannot test them directly.
+> logic in the mainline, so RPGUnit cannot test them directly. That is the real-world "monolith"
+> problem: to test those, you would first extract their logic into procedures.
 
 Keep all 6 procedures checked. The workflow then **validates the environment** - it needs **RPGUNIT**
 (to compile and run tests) and **QDEVTOOLS** (for coverage). If RPGUnit is not installed, it offers to
@@ -428,14 +459,26 @@ install it for you - click **Install**.
 > **Good news for setup:** the workflow installs RPGUnit itself and adds it to your library list - so
 > there is no separate extension setup to do by hand.
 
-Pick the **version** (v6.0.0 Recommended) and let it install.
+It asks which **version** of RPGUnit to install.
 
 ![RPGUnit version picker](images/04-09-rpgunit-version-picker.png)
 
-RPGUnit installs successfully. Choose **"Yes - Update my library list for me"** so RPGUNIT (and
-QDEVTOOLS) are on the list.
+> **Your choices here:** the list shows the **Recommended** bundled version at the top and a history of
+> released versions below it. **For this lab: pick the Recommended version (v6.0.0)** - it is the safe,
+> known-good one. (Only pick a specific newer version if your team requires it.)
+
+RPGUnit installs successfully. Then Bob notes that RPGUNIT is not yet on your library list and asks to
+add it.
 
 ![RPGUnit installed](images/04-08-rpgunit-installed.png)
+
+> **Your choices here:**
+> - **Yes - Update my library list for me** - Bob adds RPGUNIT (and QDEVTOOLS) to your library list so
+>   the tests can compile and run.
+> - **No - I updated my library list manually** - pick this only if you already added them yourself.
+>
+> **For this lab: pick "Yes - Update my library list for me."** Let Bob handle it. You will answer the
+> same way for QDEVTOOLS (used for code coverage).
 
 With the environment ready, the workflow launches a subtask to generate the docs. **Approve** the
 subtask, and **approve** its todo list (load the rpgunit-testing skill, inspect templates, inspect
@@ -451,9 +494,19 @@ source, create the module/test-suite/utilities docs).
 ![System libraries warning](images/04-12-system-libraries-warning.png)
 
 Before it finishes, the subtask shows you a **summary and asks you to confirm** the planned tests -
-the human-in-the-loop gate again. Choose **"Yes, the test plan is complete and accurate."**
+the human-in-the-loop gate again.
 
 ![Review the test plan](images/04-13b-review-test-plan.png)
+
+> **Your choices here:**
+> - **Yes, the test plan is complete and accurate** - you are happy with the planned tests; Bob
+>   finishes and saves them.
+> - **I would like to adjust the test cases or add more edge cases** - pick this to send it back for
+>   changes.
+> - **Please explain the coverage in more detail** - pick this to have Bob walk you through what it
+>   planned before you decide.
+>
+> **For this lab: pick "Yes, the test plan is complete and accurate."**
 
 When it is done, the workflow reports **Complete** and tells you what it created in the IFS:
 
@@ -488,8 +541,17 @@ Instead of failing, it **tells you exactly what is missing and asks how to proce
 ![Bob diagnoses the missing table and asks](images/04-16-missing-table-decision.png)
 
 > **This is the honest, human-in-the-loop behaviour in action.** Bob does not blindly fail or invent
-> data - it explains the gap and gives you options. Choose the first one: **"Create a minimal CUSTOMRZ
-> table in SANDBOX, compile CREDASM as a module, and implement and run the suite as planned."** Now Bob
+> data - it explains the gap and gives you options.
+>
+> **Your choices here:**
+> - **Create a minimal CUSTOMRZ table in SANDBOX, compile CREDASM, and run the suite** - Bob sets up the
+>   missing test data itself and runs the tests. Pick this when the table is genuinely missing (our case).
+> - **CUSTOMRZ exists in another library** - pick this if the table lives somewhere else; you name the
+>   library and add it to your list.
+> - **Implement the test suite only, skip creating the table or running the tests** - pick this to just
+>   write the tests and deal with the environment later.
+>
+> **For this lab: pick the first option** (create the table, compile CREDASM, run the suite). Now Bob
 > can set up the test environment and actually run the tests.
 
 ## Step 4b.3 - The tests catch a real bug
@@ -501,12 +563,18 @@ Two tests **fail** - and this is the best thing that can happen. They caught a *
 
 ![The tests catch a real rounding bug](images/04-17-test-found-real-bug.png)
 
-Bob asks how to handle it. Choose **"Fix CREDASM: widen the precision and round the payment, then
-recompile and rerun."**
+Bob asks how to handle it.
 
-> **This is the whole point of testing, in one screen.** The suite did not just pass for show - it
-> found a penny-off rounding bug in a payment calculation, flagged it, and asked you what to do. Fixing
-> it completes the loop: write tests, catch a bug, fix the code, rerun.
+> **Your choices here:**
+> - **Fix CREDASM** - widen the precision, round the payment, recompile, and rerun so the tests pass.
+>   Pick this when the *code* is wrong and you want it fixed (our case - it is a real bug).
+> - **Leave CREDASM unchanged and update the expected values in the tests** - pick this if the current
+>   behaviour is actually correct and the *test* expectation was wrong; it documents what the code does.
+> - **Leave both as they are** - pick this to note the failures as known and handle them separately.
+>
+> **For this lab: pick "Fix CREDASM."** This is the whole point of testing, in one screen - the suite
+> did not just pass for show, it found a penny-off rounding bug in a payment calculation, flagged it,
+> and asked you what to do. Fixing it completes the loop: write tests, catch a bug, fix the code, rerun.
 
 ## Step 4b.4 - Green
 
