@@ -101,6 +101,14 @@ Understand stores its map in its own IBM i library. Open **Settings**, search fo
 
 ![Settings - set the Understand install library to UNDERSTAND](images/00-06-set-understand-library.png)
 
+> **User vs Workspace (what those tabs mean):** every Bob setting can be saved in two places.
+> - **User** - applies to *you*, in every project you open. Your personal default.
+> - **Workspace** - applies only to *this* project/workspace, and overrides your user setting when you
+>   are in it.
+>
+> We set it in **both** so the Understand library is found no matter how you open the project. **For
+> this lab: type `UNDERSTAND` in the User tab, then switch to the Workspace tab and type it there too.**
+
 Then on the dashboard's **Getting started** list, click **Install Understand**. This creates the
 Understand tables and SQL procedures in that library.
 
@@ -128,14 +136,40 @@ In **Configured applications**, click the **Scan** (play) button next to Sandbox
 
 ![Configured applications - Scan button](images/00-11-app-scan-button.png)
 
-When it finishes, the status turns to **Scanned**.
+> **What the scan looks at:** Understand scans your **compiled objects** - the programs, service
+> programs, and files that have actually been built on the IBM i (the `*PGM`, `*SRVPGM`, `*FILE`
+> objects). It does *not* read raw source members. (On IBM i, you write source and then **compile** it
+> into a runnable object; the scan maps the objects and how they call each other.)
+>
+> One thing this means for our lab: **CREDASM will not appear in this scan yet**, because we have only
+> copied its *source* into SANDBOX - it has not been compiled into an object. That is fine; Part 2
+> (Business Rules) reads source directly, and Part 4 compiles CREDASM when it needs to run the tests.
 
-![Sandbox App scanned](images/00-12-app-scanned.png)
+When it finishes, the status turns to **Scanned**, and the **Last scanned** column shows **"Just now."**
+
+![Sandbox App scanned - Last scanned shows Just now](images/00-12-app-scanned.png)
+
+> **"Last scanned" matters.** The scan is a snapshot in time, not live. "Just now" means the map is
+> fresh. If you later add or change objects, this field tells you how stale the map is - and you would
+> click **Scan** again to refresh it. (Bob even reminds you of the scan age when it uses the map later.)
 
 Open the **Objects** tab to see what the scan found - here, 9 objects: the customer master file
 `CUSTMAST` and the customer programs. Select any object to inspect its dependencies.
 
 ![Objects tab - 9 objects found](images/00-13-objects-list.png)
+
+> **Reading this table - the key columns:**
+> - **Type / Attribute** - what the object is: `FILE / PF` is a physical file (a data table), `PGM /
+>   RPGLE` is an RPG program.
+> - **Inbound** - how many other objects **depend on this one** (who uses it). This is the important
+>   one for impact: `CUSTMAST` has **6 inbound**, meaning 6 programs open it. High inbound = changing
+>   it affects a lot of things.
+> - **Outbound** - how many objects **this one depends on** (what it uses). A program that opens one
+>   file has 1 outbound.
+>
+> So at a glance: `CUSTMAST` (Inbound 6) is the most-depended-on object here - the risky thing to
+> change - while the programs each have low outbound counts. This is exactly the dependency picture we
+> dig into in Part 3.
 
 > **One honest limit:** this is an **object-level** scan (programs, files, who-calls-who). It is not
 > field-level by itself. We get field-level detail in Part 3 with a quick, scoped source read.
@@ -344,10 +378,20 @@ the dependency as a diagram.
 ## Step 2 - Read the blast radius
 
 Right at the top, Bob says **"I used scan metadata only and read no source."** It returns a ranked
-list of the programs that touch CUSTMAST (CUSTUPD is the only writer - the risky one), a risk rating
-(Medium to High for a record-format change), and a colour-coded dependency diagram.
+list of the programs that touch CUSTMAST, a risk rating, and a colour-coded dependency diagram.
 
 ![Blast radius of changing CUSTMAST, from the scan](images/03-01-impact-blast-radius.png)
+
+> **How to read this response:**
+> - **The ranked table** lists every program that uses CUSTMAST, ordered by impact. The **Access**
+>   column says whether each one **reads** or **writes** the file - `CUSTUPD` is the only **writer**, so
+>   it is ranked #1 (the riskiest, because it changes data). The rest only read.
+> - **Risk: Medium to High** - Bob's judgement that a record-format change here would force every one
+>   of those programs to be recompiled.
+> - **The diagram** draws the same thing: all the programs pointing at `CUSTMAST`, colour-coded, with
+>   the writer highlighted.
+>
+> Notice how fast this came back - it read the scan, not your source. That is the whole point.
 
 ## Step 3 (optional) - Go to field level
 
@@ -582,6 +626,17 @@ Bob fixes CREDASM (widens the precision, rounds with `%dech`), recompiles, and r
 pass - 44 assertions, 0 failed, 0 errored.** The IBM i Testing panel shows the full green run.
 
 ![All 30 tests pass](images/04-18-all-tests-pass.png)
+
+> **How to read the test-results panel:**
+> - **30/30** at the top and the green checks - every test case passed.
+> - **Test Cases: 30 passed | 0 failed | 0 errored** - no failures (a *failure* is a wrong answer; an
+>   *error* is the test itself blowing up). All clean.
+> - **Assertions: 44** - the individual checks inside those tests (one test can check several things).
+> - **Compilations: 1 successful** - CREDASM (with the fix) compiled cleanly.
+> - **PASS** - the whole suite is green.
+>
+> (The "109 problems" at the bottom of the editor is just normal lint/warning noise in the editor, not
+> test failures - ignore it.)
 
 Along the way Bob created the test members (`TCREDASM` with 30 cases, `TSTUTIL` with the mock-table
 helpers), the `TESTING.JSON` config, the `CUSTOMRZ` table, compiled CREDASM, and applied the fix - all
