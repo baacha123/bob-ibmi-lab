@@ -26,9 +26,9 @@ You also need:
 > **Docs:** [Premium Package for i - Prerequisites](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/prerequisites)
 
 The sample application is **SANDBOX**, a small banking app with customer files and a credit-assessment
-service program called **CREDASM**. The source is included in this repo so you can deploy the exact
-same app - see **[sandbox-app/](sandbox-app/)** for the source and a short deploy guide. It is small on
-purpose, so you can focus on learning Bob rather than wrestling a complex application.
+service program called **CREDASM**. The source is included in this repo (in the **[sandbox-app/](sandbox-app/)**
+folder), and the next section walks you through deploying it. It is small on purpose, so you can focus
+on learning Bob rather than wrestling a complex application.
 
 ## The four parts (one story)
 
@@ -41,6 +41,92 @@ The lab tells one story end to end: **understand -> document -> impact -> test.*
 | 2. Business Rules | Extract CREDASM's business rules into a plain-English report | The program nobody fully remembers anymore |
 | 3. Impact Analysis | Use the Understand scan for a fast blast radius | Before a risky change, what breaks? |
 | 4. RPGUnit Testing | Build and run a test suite | The untested monolith, now with a safety net |
+
+---
+---
+
+# Deploy the sample app (do this first)
+
+The lab runs on the **SANDBOX** application. Its source is in the **[sandbox-app/](sandbox-app/)**
+folder of this repo, but it needs to end up as a **SANDBOX library** on your IBM i - with the file
+created and the programs compiled - before you start. Here are two ways to get it there.
+
+## What is in the app
+
+| Source | Type | What it is |
+|--------|------|------------|
+| `qddssrc/CUSTMAST.pf` | Physical file (DDS) | Customer master file - fields `CUSTID` (key), `CUSTNAME`, `BALANCE` |
+| `qrpglesrc/CUSTINQ.rpgle` | RPGLE program | Looks up a customer's name and balance by ID |
+| `qrpglesrc/CUSTUPD.rpgle` | RPGLE program | Updates a customer's balance (the only writer) |
+| `qrpglesrc/CUSTRPT.rpgle` | RPGLE program | Reports customers with a negative balance |
+| `qrpglesrc/CUSTBAL.rpgle` | RPGLE program | Flags a negative balance |
+| `qrpglesrc/CREDASM.sqlrpgle` | SQLRPGLE service program | Credit assessment - loan eligibility, interest rate, monthly payment |
+
+> **Two things on purpose:**
+> - **CREDASM is the original version, which has a small rounding bug** in the monthly-payment
+>   calculation. That is intentional - in Part 4 the tests you build catch it, and Bob fixes it. A
+>   fixed version would spoil that moment.
+> - **The `CUSTOMRZ` table CREDASM reads is not included.** In Part 4, Bob discovers it is missing and
+>   offers to create it - another teaching moment. So leave it out.
+
+## Option A - Let Bob deploy it (recommended, and the easiest)
+
+This is the on-brand way, and it doubles as a nice first demo of Bob working on IBM i: Bob reads the
+local source files and builds them on your connected IBM i for you.
+
+1. **Get the source onto your machine.** On the GitHub page, click the green **Code** button ->
+   **Download ZIP** and unzip it (or `git clone` the repo).
+2. **Open the `sandbox-app` folder in Bob.** In Bob/VS Code: **File -> Open Folder...** and open the
+   `sandbox-app` folder, so Bob can see the source files.
+3. **Connect to your IBM i** (the Setup section below covers this - do that first if you have not yet).
+4. **Start a task in the Library List workspace, in IBM i Developer mode**, and paste this prompt:
+
+   ```
+   I have the SANDBOX application source in this workspace: CUSTMAST.pf (a physical file) in qddssrc,
+   and CUSTINQ, CUSTUPD, CUSTRPT, CUSTBAL (RPGLE) plus CREDASM (SQLRPGLE) in qrpglesrc.
+
+   On my IBM i, please:
+   1. Create a library called SANDBOX.
+   2. Create source physical files SANDBOX/QDDSSRC and SANDBOX/QRPGLESRC, and copy these source
+      members into them.
+   3. Create the CUSTMAST physical file from the DDS.
+   4. Compile the four RPGLE programs (CUSTINQ, CUSTUPD, CUSTRPT, CUSTBAL) into SANDBOX.
+   5. Leave the CREDASM source in QRPGLESRC but do NOT compile it yet - a later lab step does that.
+   6. Insert three sample customer rows into CUSTMAST so there is data to work with.
+   ```
+
+5. **Approve each step** as Bob creates the library, uploads the members, compiles, and adds the data.
+
+> **Tip:** if any compile fails, just tell Bob the error - it will read it and fix it. That is part of
+> the point.
+
+## Option B - Do it by hand (the traditional way)
+
+If you prefer Code for IBM i directly: create the library and source physical files, upload the members
+(drag-and-drop in the IFS/Object Browser, FTP, or a save file), then run:
+
+```
+CRTLIB     LIB(SANDBOX)
+CRTPF      FILE(SANDBOX/CUSTMAST) SRCFILE(SANDBOX/QDDSSRC) SRCMBR(CUSTMAST)
+CRTBNDRPG  PGM(SANDBOX/CUSTINQ) SRCFILE(SANDBOX/QRPGLESRC) SRCMBR(CUSTINQ)
+CRTBNDRPG  PGM(SANDBOX/CUSTUPD) SRCFILE(SANDBOX/QRPGLESRC) SRCMBR(CUSTUPD)
+CRTBNDRPG  PGM(SANDBOX/CUSTRPT) SRCFILE(SANDBOX/QRPGLESRC) SRCMBR(CUSTRPT)
+CRTBNDRPG  PGM(SANDBOX/CUSTBAL) SRCFILE(SANDBOX/QRPGLESRC) SRCMBR(CUSTBAL)
+```
+
+Then add a few sample rows:
+
+```sql
+INSERT INTO SANDBOX.CUSTMAST VALUES (1001, 'Ada Lovelace', 250.00);
+INSERT INTO SANDBOX.CUSTMAST VALUES (1002, 'Grace Hopper', -40.00);
+INSERT INTO SANDBOX.CUSTMAST VALUES (1003, 'Alan Turing',  980.00);
+```
+
+> `CREDASM` is compiled as a service program when the testing workflow needs it in Part 4, so you do
+> not have to compile it up front - just have the source in `SANDBOX/QRPGLESRC`.
+
+Once SANDBOX exists with the file, the compiled programs, and a few rows of data, you are ready for
+Setup.
 
 ---
 ---
