@@ -21,26 +21,48 @@ deliberately simple so you can focus on learning Bob, not on a complex app.
 > **What is NOT here (on purpose):** the `CUSTOMRZ` table that CREDASM reads. In Part 4, Bob discovers
 > it is missing and offers to create it for you - that is one of the teaching moments. So leave it out.
 
-## How to deploy it to your IBM i
+## How to get this onto your IBM i
 
-You have two easy options.
+The source in this folder lives on your PC (in the repo). To do the lab, it needs to end up as a
+**SANDBOX library** on your IBM i, with the file created and the programs compiled. Here are two ways.
 
-### Option A - Let Bob do it (recommended)
+### Option A - Let Bob do it (recommended, and the easiest)
 
-Download this folder, open it in Bob, connect to your IBM i, and ask:
+This is the on-brand way, and it doubles as a nice first demo of Bob working on IBM i. Bob reads the
+local source files and builds them on your connected IBM i for you.
 
-```
-Create a library called SANDBOX. Then create the customer master file from CUSTMAST.pf, and compile
-the RPGLE programs (CUSTINQ, CUSTUPD, CUSTRPT, CUSTBAL) and the CREDASM service program into SANDBOX.
-```
+1. **Get the source onto your machine.** On the GitHub page, click the green **Code** button ->
+   **Download ZIP**, unzip it. (Or `git clone` the repo.)
+2. **Open this `sandbox-app` folder in Bob.** In Bob/VS Code: **File -> Open Folder...** and open the
+   `sandbox-app` folder. Now Bob can see the source files.
+3. **Connect to your IBM i** (the Setup section of the main lab covers this).
+4. **Start a task in the IBM i Library List workspace, in IBM i Developer mode**, and paste this prompt:
 
-Approve the steps. (This is itself a nice demo of Bob working on IBM i.)
+   ```
+   I have the SANDBOX application source in this workspace: CUSTMAST.pf (a physical file) in qddssrc,
+   and CUSTINQ, CUSTUPD, CUSTRPT, CUSTBAL (RPGLE) plus CREDASM (SQLRPGLE) in qrpglesrc.
 
-### Option B - Do it by hand
+   On my IBM i, please:
+   1. Create a library called SANDBOX.
+   2. Create source physical files SANDBOX/QDDSSRC and SANDBOX/QRPGLESRC, and copy these source
+      members into them.
+   3. Create the CUSTMAST physical file from the DDS.
+   4. Compile the four RPGLE programs (CUSTINQ, CUSTUPD, CUSTRPT, CUSTBAL) into SANDBOX.
+   5. Leave the CREDASM source in QRPGLESRC but do NOT compile it yet - a later lab step does that.
+   6. Insert three sample customer rows into CUSTMAST so there is data to work with.
+   ```
 
-1. Create the library and upload the source into source physical files (`QDDSSRC` for the DDS,
-   `QRPGLESRC` for the RPG). Your preferred upload method works - Code for IBM i, FTP, or a save file.
-2. Create the file and compile the programs, for example:
+5. **Approve each step** as Bob creates the library, uploads the members, compiles, and adds the data.
+
+That is it - and you have already seen Bob create objects and run commands on your IBM i.
+
+> **Tip:** if any compile fails, just tell Bob the error - it will read it and fix it. That is part of
+> the point.
+
+### Option B - Do it by hand (if you prefer the traditional way)
+
+If you would rather use Code for IBM i directly: create the library and source physical files, upload
+the members (drag-and-drop in the IFS/Object Browser, FTP, or a save file), then run:
 
 ```
 CRTLIB     LIB(SANDBOX)
@@ -51,10 +73,7 @@ CRTBNDRPG  PGM(SANDBOX/CUSTRPT) SRCFILE(SANDBOX/QRPGLESRC) SRCMBR(CUSTRPT)
 CRTBNDRPG  PGM(SANDBOX/CUSTBAL) SRCFILE(SANDBOX/QRPGLESRC) SRCMBR(CUSTBAL)
 ```
 
-`CREDASM` is compiled as a module/service program when the testing workflow needs it in Part 4, so you
-do not have to compile it up front - just have the source in `SANDBOX/QRPGLESRC`.
-
-3. Add a few sample customer rows so the programs have data to work with, for example:
+Then add a few sample rows:
 
 ```sql
 INSERT INTO SANDBOX.CUSTMAST VALUES (1001, 'Ada Lovelace', 250.00);
@@ -62,4 +81,8 @@ INSERT INTO SANDBOX.CUSTMAST VALUES (1002, 'Grace Hopper', -40.00);
 INSERT INTO SANDBOX.CUSTMAST VALUES (1003, 'Alan Turing',  980.00);
 ```
 
-Once SANDBOX exists with these objects, you are ready to start the lab.
+> `CREDASM` is compiled as a module/service program when the testing workflow needs it in Part 4, so
+> you do not have to compile it up front - just have the source in `SANDBOX/QRPGLESRC`.
+
+Once SANDBOX exists with the file, the compiled programs, and a few rows of data, you are ready to
+start the lab.
