@@ -1,0 +1,11 @@
+     A* Customer Master File
+     A* Fields: CUSTID (key), CUSTNAME, BALANCE
+     A                                      UNIQUE
+     A          R CUSTREC                   TEXT('Customer Master Record')
+     A            CUSTID         7P 0       TEXT('Customer ID') +
+     A                                      COLHDG('Cust' 'ID')
+     A            CUSTNAME      30A         TEXT('Customer Name') +
+     A                                      COLHDG('Customer' 'Name')
+     A            BALANCE       11P 2       TEXT('Account Balance') +
+     A                                      COLHDG('Balance')
+     A          K CUSTID

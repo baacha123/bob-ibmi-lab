@@ -23,8 +23,12 @@ You also need:
 - **A connection to an IBM i** - your own, or one your team provides. Connection details (host, user,
   password) come from your organization.
 
+> **Docs:** [Premium Package for i - Prerequisites](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/prerequisites)
+
 The sample application is **SANDBOX**, a small banking app with customer files and a credit-assessment
-service program called **CREDASM**.
+service program called **CREDASM**. The source is included in this repo so you can deploy the exact
+same app - see **[sandbox-app/](sandbox-app/)** for the source and a short deploy guide. It is small on
+purpose, so you can focus on learning Bob rather than wrestling a complex application.
 
 ## The four parts (one story)
 
@@ -81,6 +85,8 @@ Once connected, the **IBM i panel** on the left fills in. Two parts matter: the 
 > Why this matters: later, Bob saves reports as Markdown (`.md`) files. Markdown, PDFs, and logs are
 > stream files, and stream files live in the **IFS**. So you will open those reports from the IFS
 > Browser, not from a QSYS library.
+>
+> **Docs:** [Workspaces](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/workspaces) (Local, Library List, and IFS Working Directory)
 
 ## Step 3 - Open the Understand Dashboard
 
@@ -92,6 +98,8 @@ Back on the welcome page, find the **Understand Dashboard** card and click **Ope
 > it - every program and file, and who references who. Think of it as an index for your codebase.
 > Later, when you ask "what does changing this file touch?", Bob reads this map and answers in seconds
 > instead of searching all your source.
+>
+> **Docs:** [Understand](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/understand)
 
 ## Step 4 - Point Understand at a library and install it
 
@@ -237,6 +245,8 @@ Pick **New task in Library List**, and set the mode to **IBM i Developer**.
 > **Why IBM i Developer mode?** It is Bob already fluent in RPG, SQLRPGLE, and IBM i - so it
 > understands your code instead of guessing. For anything on the IBM i, this is the mode you want.
 > (Asking it to explain is still safe - it only reads.)
+>
+> **Docs:** [Modes](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/modes) (IBM i Developer and IBM i Database modes)
 
 ## Step 2 - Ask it to explain, using the scan
 
@@ -290,6 +300,8 @@ In the Bob chat, click the **Start Workflow** (play) icon at the top.
 
 > **What is a workflow? (plain English)** In base Bob you drove step by step. A workflow is a guided,
 > multi-step process for a common IBM i job - it walks you through it and does the heavy lifting.
+>
+> **Docs:** [Workflows](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/workflows) (all five: RPG Modernization, Business Rules Extraction, RPGUnit Test Plan, RPGUnit Test Suite, SQL Index Advisor)
 
 The **Bob workflows** panel lists five. Click **Start** on **Business Rules Extraction**.
 
@@ -726,6 +738,15 @@ With the same Bob you learned in the first lab, now on a real IBM i, you:
 
 That is understand, document, impact, test - the everyday work of IBM i development, accelerated, with
 you in control the whole way.
+
+---
+
+## Learn more (Bob Docs)
+
+- **Premium Package for i docs home:** <https://bob.ibm.com/docs/ide>
+- [Prerequisites](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/prerequisites) · [Workspaces](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/workspaces) · [Modes](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/modes)
+- [Understand](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/understand) · [Workflows](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/workflows) · [Skills](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/skills) · [Slash commands](https://bob.ibm.com/docs/ide/premium-packages/bob-for-i/slash-commands)
+- New to base Bob first? See the base Bob lab: <https://github.com/baacha123/bob-first-lab>
 
 ---
 
